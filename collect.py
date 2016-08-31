@@ -7,18 +7,19 @@ Created on Tue Aug 30 14:46:55 2016
 
 import tweepy
 import datetime
-import json
 
 class StdOutListener(tweepy.StreamListener):
     def on_data(self, data):
-        s3 = boto3.resource('s3')
-        s3.Bucket('ci-tweets').put_object(Key=str(datetime.datetime.now())+'.json',  Body=data)
+        f = open('temp_tweets/' + str(datetime.datetime.now()).replace(':', '.') + '.json', 'w')
+        f.write(data)
+        f.close()
         
         return True
 
     def on_error(self, status):
         f = open('errorlog.txt', 'w')
-        f.write()
+        f.write(status)
+        f.close()
         print(status)
 
 

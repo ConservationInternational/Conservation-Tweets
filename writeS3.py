@@ -7,10 +7,16 @@ Created on Wed Aug 31 12:47:54 2016
 
 import os
 import boto3
+import datetime
 
-os.chdir('~/temp_tweets')
+files = os.listdir('temp_tweets')
 
-files = os.listdir()
+data = []
+for i in files:
+    f = open ('temp_tweets/' + i)
+    data.append(f.read())
+    f.close()
+    os.remove('temp_tweets/' + i)
 
 s3 = boto3.resource('s3')
-s3.Bucket('ci-tweets').put_object(Key=str(datetime.datetime.now())+'.txt',  Body=data)
+s3.Bucket('ci-tweets').put_object(Key=str(datetime.datetime.now()).replace(':', '.') + '.txt',  Body='\n'.join(data))
