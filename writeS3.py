@@ -1,25 +1,41 @@
 import os
 import boto3
 import datetime
-import pandas
 import json
 
 files = os.listdir('temp_tweets')
 
-columns = pandas.read_csv('collect_columns.csv', header=0)
-columns = list(columns.loc[columns['select'], 'name'])
+data = ['coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,text,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
 
-dataframes = []
 for i in files:
-    f = open('temp_tweets/' + i, 'r')
-    out = json.loads(f.read())
-    f.close()
-    df = pandas.io.json.json_normalize(out)
-    df = df[[c for c in columns if c in df.columns]]
-    dataframes.appends(df)
-    os.remove('temp_tweets/' + i)
+    try:
+        f = open('temp_tweets/' + i, 'r')
+        out = json.loads(f.read())
+        f.close()
 
-dataframe = pandas.concat(dataframes)
+        twt = [out.get('coordinates'),
+                out.get('created_at'),
+                out.get('favorite_count'),
+                out.get('favorited'),
+                out.get('geo'),
+                out.get('place'),
+                out.get('retweet_count'),
+                out.get('retweeted'),
+                out.get('text'),
+                out.get('user').get('favourites_count'),
+                out.get('user').get('friends_count'),
+                out.get('user').get('geo_enabled'),
+                out.get('user').get('location'),
+                out.get('user').get('name'),
+                out.get('user').get('statuses_count')]
+        twt = '@^@#%*'.join(map(unicode, twt))
+        twt = twt.replace(',', ' ').replace('\n', ' ').replace('@^@#%*', ',')
+        data.append(twt)
+
+    except:
+        pass
+
+    os.remove('temp_tweets/' + i)
 	
 s3 = boto3.resource('s3')
-s3.Bucket('ci-tweets').put_object(Key=str(datetime.datetime.now()).replace(':', '.') + '.csv',  Body=dataframe.to_csv(None))
+s3.Bucket('ci-tweets').put_object(Key=str(datetime.datetime.now()).replace(':', '.') + '.csv',  Body='\n'.join(data))

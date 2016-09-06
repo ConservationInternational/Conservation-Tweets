@@ -36,4 +36,4 @@ filt = set(filt)
 filt = ','.join(filt)
 
 stream = tweepy.Stream(auth, l)
-stream.filter(langauges=['en'], track=[filt])
+stream.filter(languages=['en'], track=[filt])
