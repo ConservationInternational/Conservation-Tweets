@@ -17,10 +17,9 @@ class StdOutListener(tweepy.StreamListener):
         return True
 
     def on_error(self, status):
-        f = open('errorlog.txt', 'w')
-        f.write(status)
+		f = open('errorlong.txt', 'w')
+		f.write(str(datetime.datetime.now())+str(status))
         f.close()
-        print(status)
 
 
 l = StdOutListener()
@@ -32,8 +31,9 @@ f = open('keywords.txt', 'r')
 for i in f:
     filt.append(i.rstrip('\n'))
 f.close()
-    
+
+filt = set(filt)
 filt = ','.join(filt)
 
 stream = tweepy.Stream(auth, l)
-stream.filter(track=[filt])
+stream.filter(langauges=['en'], track=[filt])
