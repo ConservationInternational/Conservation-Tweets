@@ -5,7 +5,7 @@ import json
 
 files = os.listdir('temp_tweets')
 
-data = ['coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,text,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
+data = ['id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,text,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
 
 for i in files:
     try:
@@ -13,7 +13,8 @@ for i in files:
         out = json.loads(f.read())
         f.close()
 
-        twt = [out.get('coordinates'),
+        twt = [out.get('id_str'),
+				out.get('coordinates'),
                 out.get('created_at'),
                 out.get('favorite_count'),
                 out.get('favorited'),
@@ -38,4 +39,4 @@ for i in files:
     os.remove('temp_tweets/' + i)
 	
 s3 = boto3.resource('s3')
-s3.Bucket('ci-tweets').put_object(Key=str(datetime.datetime.now()).replace(':', '.') + '.csv',  Body='\n'.join(data))
+s3.Bucket('ci-tweets').put_object(Key='v2' + str(datetime.datetime.now()).replace(':', '.') + '.csv',  Body='\n'.join(data))
