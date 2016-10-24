@@ -3,7 +3,7 @@ entities.hashtags,FALSE
 entities.symbols,FALSE
 entities.urls,FALSE
 filter_level,FALSE
-id_str,FALSE
+id_str,TRUE
 in_reply_to_screen_name,FALSE
 in_reply_to_status_id,FALSE
 in_reply_to_status_id_str,FALSE

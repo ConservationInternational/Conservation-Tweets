@@ -18,7 +18,7 @@ class StdOutListener(tweepy.StreamListener):
 
     def on_error(self, status):
 		f = open('errorlong.txt', 'w')
-		f.write(str(datetime.datetime.now())+str(status))
+		f.write(str(datetime.datetime.now())+str(status.text))
         f.close()
 
 
