@@ -29,8 +29,8 @@ for i in files:
                 out.get('user').get('location'),
                 out.get('user').get('name'),
                 out.get('user').get('statuses_count')]
-        twt = '@^@#%*'.join(map(unicode, twt))
-        twt = twt.replace(',', ' ').replace('\n', ' ').replace('@^@#%*', ',')
+        twt = '@^@#%*^&%*$('.join(map(unicode, twt))
+        twt = twt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
         data.append(twt)
 
     except:
