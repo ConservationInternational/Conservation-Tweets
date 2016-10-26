@@ -39,4 +39,4 @@ for i in files:
     os.remove('temp_tweets/' + i)
 	
 s3 = boto3.resource('s3')
-s3.Bucket('ci-tweets').put_object(Key='v2' + str(datetime.datetime.now()).replace(':', '.') + '.csv',  Body='\n'.join(data))
+s3.Bucket('ci-tweets').put_object(Key='v3' + str(datetime.datetime.now()).replace(':', '.') + '.csv',  Body='\n'.join(data))
