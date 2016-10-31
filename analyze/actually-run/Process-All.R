@@ -21,11 +21,8 @@ for (f in files){
 }
 
 cleanTweet <- function(str){
-  if(is.null(str)){
-    return('')  
-  }else if(is.na(str)){
-    return('')
-  }
+  str[is.null(str)] <- ''
+  str[is.na(str)] <- ''
   
   clean <- gsub('[^[:alnum:] @#]', '', str)
   
@@ -66,6 +63,8 @@ for(f in files){
   }
   
   keysdf <- bind_rows(keysdf, df)
+  
+  write.csv(keysdf, 'keysdf.csv', row.names=F)
   
 }
 
