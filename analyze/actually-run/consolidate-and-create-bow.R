@@ -29,8 +29,8 @@ textToBagOfWords <- function(str){
   words
 }
 
-dates <- c(paste0('2016-09-', substr(100+seq(7,30),2,3)),
-           paste0('2016-10-', substr(100+seq(1,26),2,3)))
+dates <- c(paste0('2016-09-', substr(100+seq(09,30),2,3)),
+           paste0('2016-10-', substr(100+seq(24,25),2,3)))
 
 for (d in dates){
   print(d)
@@ -54,7 +54,7 @@ for (d in dates){
   
   print("Making Bag of Words")
   bound$BoW <- sapply(X=bound$text, FUN=textToBagOfWords)
-  write.csv(bound[ , c('id_str', 'BoW')], paste0('~/temp/v1-', d, '-BoW.csv'), row.names=F)
+  write.csv(bound[ , c('id_str', 'BoW')], paste0('temp/v1-', d, '-BoW.csv'), row.names=F)
   system(paste0("sudo aws s3 cp temp/v1-", d, "-BoW.csv s3://ci-tweets"))
   
   
