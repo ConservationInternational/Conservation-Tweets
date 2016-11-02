@@ -5,16 +5,14 @@ import json
 
 files = os.listdir('temp_tweets')
 
-data = ['id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,text,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
-
+data = []
 for i in files:
     try:
         f = open('temp_tweets/' + i, 'r')
         out = json.loads(f.read())
         f.close()
-
         twt = [out.get('id_str'),
-				out.get('coordinates'),
+                out.get('coordinates'),
                 out.get('created_at'),
                 out.get('favorite_count'),
                 out.get('favorited'),
@@ -23,6 +21,7 @@ for i in files:
                 out.get('retweet_count'),
                 out.get('retweeted'),
                 out.get('text'),
+                out.get('lang'),
                 out.get('user').get('favourites_count'),
                 out.get('user').get('friends_count'),
                 out.get('user').get('geo_enabled'),
@@ -32,11 +31,20 @@ for i in files:
         twt = '@^@#%*^&%*$('.join(map(unicode, twt))
         twt = twt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
         data.append(twt)
-
     except:
         pass
 
     os.remove('temp_tweets/' + i)
-	
-s3 = boto3.resource('s3')
-s3.Bucket('ci-tweets').put_object(Key='v3' + str(datetime.datetime.now()).replace(':', '.') + '.csv',  Body='\n'.join(data))
+    
+f = open('keywords.txt', 'r')
+keywords = f.read().splitlines()
+f.close()
+
+for k in keywords:
+    tempdat = ['id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,text,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
+    for t in data:
+        if k.lower() in t.lower():
+            tempdat.append(t)    
+    if len(tempdat) > 1:    
+        s3 = boto3.resource('s3')
+        s3.Bucket('ci-tweets').put_object(Key='ByKeyword/' + k.replace(' ', '.') + '-' + str(datetime.datetime.now())[:10] + '.csv',  Body='\n'.join(tempdat))

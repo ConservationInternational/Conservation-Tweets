@@ -10,7 +10,7 @@ in_reply_to_status_id_str,FALSE
 in_reply_to_user_id,FALSE
 in_reply_to_user_id_str,FALSE
 is_quote_status,FALSE
-lang,FALSE
+lang,TRUE
 possibly_sensitive,FALSE
 quoted_status.contributors,FALSE
 quoted_status.created_at,FALSE
