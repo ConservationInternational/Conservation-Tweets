@@ -34,7 +34,7 @@ for i in files:
     except:
         pass
 
-    os.remove('temp_tweets/' + i)
+    #os.remove('temp_tweets/' + i)
     
 f = open('keywords.txt', 'r')
 keywords = f.read().splitlines()
@@ -43,10 +43,10 @@ f.close()
 for k in keywords:
     tempdat = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
     
-    k = k.split('&')
+    ks = k.split('&')
        
     for t in data:
-        if all(x in t[:t.find(',')].lower() for x in k.lower()):
+        if all(x.lower() in t[:t.find(',')].lower() for x in ks):
             tempdat.append(t)
     if len(tempdat) > 1:    
         s3 = boto3.resource('s3')
