@@ -11,7 +11,8 @@ for i in files:
         f = open('temp_tweets/' + i, 'r')
         out = json.loads(f.read())
         f.close()
-        twt = [out.get('id_str'),
+        twt = [out.get('text'),
+                out.get('id_str'),
                 out.get('coordinates'),
                 out.get('created_at'),
                 out.get('favorite_count'),
@@ -20,7 +21,6 @@ for i in files:
                 out.get('place'),
                 out.get('retweet_count'),
                 out.get('retweeted'),
-                out.get('text'),
                 out.get('lang'),
                 out.get('user').get('favourites_count'),
                 out.get('user').get('friends_count'),
@@ -41,10 +41,13 @@ keywords = f.read().splitlines()
 f.close()
 
 for k in keywords:
-    tempdat = ['id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,text,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
+    tempdat = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
+    
+    k = k.split('&')
+       
     for t in data:
-        if k.lower() in t.lower():
-            tempdat.append(t)    
+        if all(x in t[:t.find(',')].lower() for x in k.lower()):
+            tempdat.append(t)
     if len(tempdat) > 1:    
         s3 = boto3.resource('s3')
         s3.Bucket('ci-tweets').put_object(Key='ByKeyword/' + k.replace(' ', '.') + '-' + str(datetime.datetime.now())[:10] + '.csv',  Body='\n'.join(tempdat))
