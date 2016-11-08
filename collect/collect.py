@@ -29,7 +29,7 @@ auth.set_access_token(accessToken, accessTokenSecret)
 filt = []
 f = open('keywords.txt', 'r')
 for i in f:
-    filt.append(i.rstrip('\n'))
+    filt.append(i.rstrip('\n').replace('&', ' '))
 f.close()
 
 filt = set(filt)

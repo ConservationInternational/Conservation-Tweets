@@ -71,7 +71,7 @@ def main():
     if not values:
         print('No data found.')
     else:
-        words = open('keywords.txt', 'w')
+        words = open('keywords.txt', 'a')
         for row in values:
             words.write(row[0] + '\n')
         words.close()

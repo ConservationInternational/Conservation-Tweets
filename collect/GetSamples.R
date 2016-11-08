@@ -1,26 +1,29 @@
 library(twitteR)
 library(dplyr)
 
-setwd('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets')
+#Sets up the directory you will work from
+setwd('D:\\Documents and Settings\\mcooper\\Documents\\Conservation Tweets')
 
-source('llaves.R')
+#look for a file called "keys.R", with the 4 key variables in it
+source('Credentials.R')
 
 setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessSecret)
 
-IndWordList <- c('kebakaran hutan', 'kahutla', 'sampah', 'terumbu karang', 'pari manta', 'harimau', 'gajah', 'perubahan iklim', 'gas rumah kaca', 'hiu paus')
+#Create a list of words to search for
+IndWordList <- c('kebakaran hutan', 'kahutla', 'sampah', 'terumbu karang', 'pari manta', 'harimau', 'gajah', 'perubahan iklim', 'gas rumah kaca', 'hiu paus', 'Orangutan')
 
-#Started at 1:07pm
 IndResultsAll <- data.frame()
 repeat{
   for (i in IndWordList){
-    try({IndResults <- searchTwitter(searchString=i, n=1000, retryOnRateLimit=10, geocode='-2.755964,120.8247856,1000mi')
-    IndResultsDf <- twListToDF(IndResults)})
+    try({
+    IndResults <- searchTwitter(searchString=' ', n=100000, retryOnRateLimit=10, lang='en')
+    IndResultsDf <- twListToDF(IndResults)
+    })
     IndResultsDf$key <- i
-    IndResultsAll <- unique(bind_rows(IndResultsAll, IndResultsDf[ , c('key', 'text', 'latitude', 'longitude')]))
+    IndResultsAll <- unique(bind_rows(IndResultsAll, IndResultsDf[ , c('key', 'text', 'latitude', 'longitude', 'created')]))
     print(i)
     Sys.sleep(15)
   }
   print(paste0("We've got ", nrow(IndResultsAll), " Bahasa tweets"))
-  plot(IndResultsAll$longitude, IndResultsAll$latitude)
   write.csv(IndResultsAll, 'IndResultsAll.csv', row.names=F)
 }

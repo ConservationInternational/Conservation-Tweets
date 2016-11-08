@@ -1,5 +1,7 @@
 keys.py
-.
+keys.R
 client_secret.json
 llaves.R
 IndResultsAll.csv
+collect/keys.py
+analyze/llaves.R
