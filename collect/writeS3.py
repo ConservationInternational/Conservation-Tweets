@@ -3,30 +3,20 @@ import boto3
 import datetime
 import json
 
-files = os.listdir('temp_tweets')
-    
+today = str(datetime.datetime.now() - datetime.timedelta(1))[:10]
+
+tagged_files = os.listdir('tagged_tweets')
+
 f = open('keywords.txt', 'r')
 keywords = f.read().splitlines()
 f.close()
-
-for f in files:
-
-    t = open('temp_tweets/' + f, 'r')
-    raw = t.read()    
-    
-    for k in keywords:
-        ks = k.split('&')
-        if all(raw.lower().find(x.lower()) > -1 for x in ks):
-            f.write('tagged_tweets/' + k + f)
-
-tagged_files = os.listdir('tagged_tweets')
 
 for k in keywords:
 
     data = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']    
     
     for fl in tagged_files:
-        if k in fl:    
+        if k in fl and today in fl:                        
             try:
                 f = open('tagged_tweets/' + f, 'r')
                 out = json.loads(f.read())
@@ -50,11 +40,14 @@ for k in keywords:
                         out.get('user').get('statuses_count')]
                 twt = '@^@#%*^&%*$('.join(map(unicode, twt))
                 twt = twt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
-                if all(x.lower() in twt[:twt.find(',')].lower() for x in ks):
-                    data.append(twt)
+                data.append(twt)
             except:
                 pass    
         
-        if len(data) > 1:    
-            s3 = boto3.resource('s3')
-            s3.Bucket('ci-tweets').put_object(Key='test/' + k.replace(' ', '.') + '-' + str(datetime.datetime.now())[:10] + '.csv',  Body='\n'.join(data))
+    if len(data) > 1:    
+        s3 = boto3.resource('s3')
+        s3.Bucket('ci-tweets').put_object(Key='ByKeywords/' + k.replace(' ', '.') + '-' + today + '.csv',  Body='\n'.join(data))
+
+for fl in tagged_files:
+    if today in fl:
+        os.remove('tagged_tweets/' + fl)
