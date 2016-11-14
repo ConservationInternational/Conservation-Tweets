@@ -18,7 +18,7 @@ for k in keywords:
     for fl in tagged_files:
         if k in fl and today in fl:                        
             try:
-                f = open('tagged_tweets/' + f, 'r')
+                f = open('tagged_tweets/' + fl, 'r')
                 out = json.loads(f.read())
                 f.close()
                 twt = [out.get('text'),
