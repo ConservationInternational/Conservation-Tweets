@@ -46,6 +46,6 @@ for k in keywords:
     if len(data) > 1:    
         s3 = boto3.resource('s3')
         s3.Bucket('ci-tweets').put_object(Key='ByKeyword/' + k.replace(' ', '.') + '-' + today + '.csv',  Body='\n'.join(data))
-    for fl in delete:
+    for fl in tagged_files:
         if k in fl:
             os.remove('tagged_tweets/' + fl)
