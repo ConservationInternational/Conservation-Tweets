@@ -12,9 +12,8 @@ keywords = f.read().splitlines()
 f.close()
 
 for k in keywords:
-
-    data = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']    
-    
+    data = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
+    ks = k.split('&')
     for fl in tagged_files:
         if k in fl and today in fl:                        
             try:
@@ -38,16 +37,15 @@ for k in keywords:
                         out.get('user').get('location'),
                         out.get('user').get('name'),
                         out.get('user').get('statuses_count')]
-                twt = '@^@#%*^&%*$('.join(map(unicode, twt))
-                twt = twt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
-                data.append(twt)
+                if all(x in twt[0] for x in ks):                
+                    twt = '@^@#%*^&%*$('.join(map(unicode, twt))
+                    twt = twt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
+                    data.append(twt)
             except:
                 pass    
-        
     if len(data) > 1:    
         s3 = boto3.resource('s3')
-        s3.Bucket('ci-tweets').put_object(Key='ByKeywords/' + k.replace(' ', '.') + '-' + today + '.csv',  Body='\n'.join(data))
-
-for fl in tagged_files:
-    if today in fl:
-        os.remove('tagged_tweets/' + fl)
+        s3.Bucket('ci-tweets').put_object(Key='ByKeyword/' + k.replace(' ', '.') + '-' + today + '.csv',  Body='\n'.join(data))
+    for fl in delete:
+        if k in fl:
+            os.remove('tagged_tweets/' + fl)
