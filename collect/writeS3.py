@@ -48,4 +48,7 @@ for k in keywords:
         s3.Bucket('ci-tweets').put_object(Key='ByKeyword/' + k.replace(' ', '.') + '-' + today + '.csv',  Body='\n'.join(data))
     for fl in tagged_files:
         if k in fl:
-            os.remove('tagged_tweets/' + fl)
+            try:
+                os.remove('tagged_tweets/' + fl)
+            except:
+                pass
