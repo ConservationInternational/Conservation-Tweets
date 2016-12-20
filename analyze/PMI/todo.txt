@@ -1,0 +1,2 @@
+Make one long script
+Get word count and merge with results (might take some pandas)

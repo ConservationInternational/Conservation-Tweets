@@ -33,12 +33,12 @@ diff = merge(A, C, f=diff)
 
 f = open(firstname + '_results.csv', 'wb')
 for i in A:
-    f.write(i.encode('utf-8') + ',' + str(A[i]) + '\n')
+    f.write(i + ',' + str(A[i]) + '\n')
 
 f = open(secondname + '_results.csv', 'wb')
 for i in C:
-    f.write(i.encode('utf-8') + ',' + str(C[i]) + '\n')
+    f.write(i + ',' + str(C[i]) + '\n')
 
 f = open(firstname + '_' + secondname + '_results.csv', 'wb')
 for i in diff:
-    f.write(i.encode('utf-8') + ',' + str(diff[i]) + '\n')
+    f.write(i + ',' + str(diff[i]) + '\n')
