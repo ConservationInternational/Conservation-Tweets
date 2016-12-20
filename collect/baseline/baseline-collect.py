@@ -27,4 +27,4 @@ auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
 auth.set_access_token(accessToken, accessTokenSecret)
 
 stream = tweepy.Stream(auth, l)
-stream.sample(languages=['id'])
+stream.sample(languages=['id', 'en'])

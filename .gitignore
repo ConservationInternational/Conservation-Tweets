@@ -5,3 +5,4 @@ llaves.R
 IndResultsAll.csv
 collect/keys.py
 analyze/llaves.R
+*.p
