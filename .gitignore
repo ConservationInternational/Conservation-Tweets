@@ -6,3 +6,5 @@ IndResultsAll.csv
 collect/keys.py
 analyze/llaves.R
 *.p
+analyze/*.csv
+analyze/**/*.csv

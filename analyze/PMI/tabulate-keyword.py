@@ -9,7 +9,7 @@ Created on Mon Dec 19 16:19:22 2016
 
 searchkey = 'climate.change'
 searchstart = '2016-09-09'
-searchend = '2016-11-07'
+searchend = '2016-09-10'
 saveas = 'climatechange-pre'
 
 import boto3
@@ -17,6 +17,8 @@ import pickle
 from collections import defaultdict
 import datetime
 import sys
+import pandas
+import re
 
 def generatefiles(keyword, start='2016-09-06', end=99):
     if end==99:
@@ -58,20 +60,21 @@ elif sys.platform == 'linux2':
 conditionaldict = defaultdict(int)
 for f in files:
     print('now on file ' + f)
-    try:
-        out = s3.get_object(Bucket='ci-tweets', Key=f)
-        file = out['Body'].read()
-        lines = file.decode('utf-8').split('\n')
-        for l in lines[1:]:
-            words = l.split()
-            for w in words:
-                if w=='rt':
-                    pass
-                elif w[:4]=='http':
-                    conditionaldict['http'] += 1
-                else:
-                    conditionaldict[w] += 1
-            conditionaldict['TOTAL'] += 1
+    out = s3.get_object(Bucket='ci-tweets', Key=f)
+    file = pandas.read_csv(out['Body'])
+    lines = file["text"].tolist()
+    for l in lines:
+        l = re.sub(r'[^a-z#@ ]', '', l.lower())
+        words = l.split()
+        for w in set(words):
+            if w=='rt':
+                pass
+            elif w[:4]=='http':
+                conditionaldict['http'] += 1
+            else:
+                conditionaldict[w] += 1
+        conditionaldict['TOTAL'] += 1
+            
     except:
         print('File ' + f + ' was skipped')
         

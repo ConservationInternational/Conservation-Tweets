@@ -9,6 +9,7 @@ import boto3
 import pickle
 from collections import defaultdict
 import sys
+import re
 
 if sys.platform == 'win32':
     f = open('D:/Documents and Settings/mcooper/.aws/credentials')
@@ -35,8 +36,9 @@ for f in files:
     file = out['Body'].read()
     lines = file.decode('utf-8').split('\n')
     for l in lines[1:]:
+        l = re.sub(r'[^a-z#@ ]', '', l.lower())
         words = l.split()
-        for w in words:
+        for w in set(words):
             if w=='rt':
                 pass
             elif w[:4]=='http':
