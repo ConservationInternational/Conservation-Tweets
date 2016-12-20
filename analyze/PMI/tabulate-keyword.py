@@ -8,7 +8,7 @@ Created on Mon Dec 19 16:19:22 2016
 #Paramaters to se
 
 searchkey = 'climate.change'
-searchstart = '2016-09-06'
+searchstart = '2016-09-09'
 searchend = '2016-11-07'
 saveas = 'climatechange-pre'
 
@@ -16,6 +16,7 @@ import boto3
 import pickle
 from collections import defaultdict
 import datetime
+import sys
 
 def generatefiles(keyword, start='2016-09-06', end=99):
     if end==99:
@@ -45,11 +46,14 @@ def generatefiles(keyword, start='2016-09-06', end=99):
 files = generatefiles(searchkey, searchstart, searchend)
 
 #Locally
-f = open('D:/Documents and Settings/mcooper/.aws/credentials')
-read = f.readlines()
-access_key = read[1][20:-1]
-secret_key = read[2][24:-1]
-s3 = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_key)
+if sys.platform == 'win32':
+    f = open('D:/Documents and Settings/mcooper/.aws/credentials')
+    read = f.readlines()
+    access_key = read[1][20:-1]
+    secret_key = read[2][24:-1]
+    s3 = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_key)
+elif sys.platform == 'linux2':
+    s3 = boto3.client('s3')
 
 conditionaldict = defaultdict(int)
 for f in files:
@@ -70,5 +74,11 @@ for f in files:
             conditionaldict['TOTAL'] += 1
     except:
         print('File ' + f + ' was skipped')
+        
+conditionaldict = dict(conditionaldict)
+total = float(conditionaldict['TOTAL'])
+for i in conditionaldict:
+    conditionaldict[i] = float(conditionaldict[i])/total
 
-pickle.dump(conditionaldict, open("D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/PMI/" + saveas + ".p", "wb"))
+
+pickle.dump(conditionaldict, open(saveas + ".p", "wb"), protocol=2)

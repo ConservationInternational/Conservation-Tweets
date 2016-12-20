@@ -6,6 +6,7 @@ Created on Mon Dec 19 16:51:39 2016
 """
 
 import pickle
+import math
 
 baseline = pickle.load(open("baseline_2016-12-19.p", "rb"))
 
@@ -25,7 +26,7 @@ for i in second:
     second[i] = second[i]/stot
     
 def merge(A, B, f):
-	merged = {k: f(A[k], B[k]) for k in A.keys() & B.keys())
+	merged = {k: f(A[k], B[k]) for k in A.viewkeys() & B.viewkeys()}
 	
 def pmi(A, B):
 	return math.log(A/B)
