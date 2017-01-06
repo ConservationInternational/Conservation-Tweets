@@ -88,4 +88,5 @@ for f in files:
     except:
         print('File ' + f + ' was skipped')
 
+
 pickle.dump(conditionaldict, open(saveas + ".p", "wb"), protocol=2)
