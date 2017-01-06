@@ -17,8 +17,19 @@ if sys.platform == 'win32':
     access_key = read[1][20:-1]
     secret_key = read[2][24:-1]
     s3 = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_key)
+    
+    stopwords = []    
+    f = open('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/stopwords.txt')
+    for i in f.readlines():
+        stopwords.append(i.rstrip('\n'))
+    
 elif sys.platform == 'linux2':
     s3 = boto3.client('s3')
+    
+    stopwords = []    
+    f = open('~/stopwords.txt')
+    for i in f.readlines():
+        stopwords.append(i.rstrip('\n'))
 
 
 paginator = s3.get_paginator('list_objects')
@@ -39,7 +50,7 @@ for f in files:
         l = re.sub(r'[^a-z#@ ]', '', l.lower())
         words = l.split()
         for w in set(words):
-            if w=='rt':
+            if w=='rt' or w in stopwords:
                 pass
             elif w[:4]=='http':
                 masterdict['http'] += 1
