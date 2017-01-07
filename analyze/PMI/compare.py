@@ -49,9 +49,9 @@ pmi_diff = merge(frst_pmi, scnd_pmi, f=diff)
 
 all_count = merge(frst_count, scnd_count, f=countSum)
 
-frst_pmi_count = merge(frst_pmi, frst_count)
-scnd_pmi_count = merge(scnd_pmi, scnd_count)
-pmi_diff_count = merge(pmi_diff, all_count)
+frst_pmi_count = merge(frst_pmi, frst_count, f=valueConcat)
+scnd_pmi_count = merge(scnd_pmi, scnd_count, f=valueConcat)
+pmi_diff_count = merge(pmi_diff, all_count, f=valueConcat)
 
 
 f = open(firstname + '_results.csv', 'wb')

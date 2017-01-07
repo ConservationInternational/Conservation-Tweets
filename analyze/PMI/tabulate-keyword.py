@@ -7,9 +7,9 @@ Created on Mon Dec 19 16:19:22 2016
 
 #Paramaters to set
 searchkey = 'climate.change'
-searchstart = '2016-09-06'
-searchend = '2016-11-07'
-saveas = 'climatechange-pre'
+searchstart = '2016-11-09'
+searchend = '2016-12-31'
+saveas = 'climatechange-post'
 
 import boto3
 import pickle
