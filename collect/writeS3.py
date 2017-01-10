@@ -2,6 +2,7 @@ import os
 import boto3
 import datetime
 import json
+import carmen
 
 today = str(datetime.datetime.now() - datetime.timedelta(1))[:10]
 
@@ -11,8 +12,11 @@ f = open('keywords.txt', 'r')
 keywords = f.read().splitlines()
 f.close()
 
+resolver = carmen.get_resolver()
+resolver.load_locations()
+
 for k in keywords:
-    data = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count']
+    data = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count,user.location.country,user.location.state,user.location.county,user.location.city,user.location.latitude,user.location.longitude']
     ks = k.split('&')
     for fl in tagged_files:
         if k in fl and today in fl:                        
@@ -37,6 +41,12 @@ for k in keywords:
                         out.get('user').get('location'),
                         out.get('user').get('name'),
                         out.get('user').get('statuses_count')]
+                loc = resolver.resolve_tweet(out)
+                if loc is not None:
+                    loc = loc[1]
+                    twt += [loc.country, loc.state, loc.county, loc.city, str(loc.latitude), str(loc.longitude)]
+                else:
+                    twt += ['', '', '', '', '', '']
                 if all(x in twt[0] for x in ks):                
                     twt = '@^@#%*^&%*$('.join(map(unicode, twt))
                     twt = twt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
@@ -45,10 +55,12 @@ for k in keywords:
                 pass    
     if len(data) > 1:    
         s3 = boto3.resource('s3')
-        s3.Bucket('ci-tweets').put_object(Key='ByKeyword/' + k.replace(' ', '.') + '-' + today + '.csv',  Body='\n'.join(data))
+        s3.Bucket('ci-tweets').put_object(Key='Test/' + k.replace(' ', '.') + '-' + today + '.csv',  Body='\n'.join(data))
+               
     for fl in tagged_files:
         if k in fl and today in fl:
             try:
                 os.remove('tagged_tweets/' + fl)
             except:
                 pass
+
