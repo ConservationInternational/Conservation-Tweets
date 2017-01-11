@@ -58,4 +58,11 @@ for f in files:
                 masterdict[w] += 1
         masterdict['TOTAL'] += 1
 
-pickle.dump(masterdict, open("baseline_2016-12-19.p", "wb"), protocol=2)
+pickle.dump(masterdict, open("baseline_2017-01-06_raw.p", "wb"), protocol=2)
+
+masterdict = dict(masterdict)
+total = float(masterdict['TOTAL'])
+for i in masterdict:
+    masterdict[i] = float(masterdict[i])/float(total)
+ 
+pickle.dump(masterdict, open("baseline_2017-01-06_prob.p", "wb"), protocol=2)
