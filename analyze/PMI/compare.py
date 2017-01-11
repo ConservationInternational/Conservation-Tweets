@@ -43,9 +43,6 @@ def diff(A, B):
 def countSum(A, B):
     return sum([A, B])
 
-def valueConcat(A, B):
-    return ([A, B])
-
 frst_freq = convertFreq(frst_count)
 scnd_freq = convertFreq(scnd_count)
 
@@ -53,7 +50,6 @@ frst_pmi = merge(frst_freq, base_freq, f=pmi)
 scnd_pmi = merge(scnd_freq, base_freq, f=pmi)
 
 pmi_diff = merge(frst_pmi, scnd_pmi, f=diff)
-
 all_count = merge(frst_count, scnd_count, f=countSum)
 
 f = open(firstname + '_results.csv', 'w')
