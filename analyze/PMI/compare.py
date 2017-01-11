@@ -7,23 +7,31 @@ Created on Mon Dec 19 16:51:39 2016
 
 import pickle
 import math
+import sys
+import os
 
-firstname = "climatechange-post"
-secondname = "climatechange-pre"
+if sys.platform == 'win32':
+    os.chdir('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/PMI')
 
-base_count = dict(pickle.load(open("baseline_2016-12-19.p", "rb")))
+firstname = "vegan"
+secondname = "vegetarian"
+
+base_freq = dict(pickle.load(open("baseline_2017-01-06_prob.p", "rb")))
 frst_count = dict(pickle.load(open(firstname + ".p", "rb")))
 scnd_count = dict(pickle.load(open(secondname + ".p", "rb")))
 
 def convertFreq(masterdict):
     total = float(masterdict['TOTAL'])
     newdict = {}
-    for i in newdict:
-        newdict[i] = float(newdict[i])/float(total)
+    for i in masterdict:
+        newdict[i] = float(masterdict[i])/float(total)
     return newdict
-    
+
 def merge(A, B, f):
-    merged = {k: f(A[k], B[k]) for k in A.viewkeys() & B.viewkeys()}
+    if sys.platform == 'win32':
+        merged = {k: f(A[k], B[k]) for k in A.keys() & B.keys()}
+    elif sys.platform == 'linux2':
+        merged = {k: f(A[k], B[k]) for k in A.viewkeys() & B.viewkeys()}
     return merged
 
 def pmi(A, B):
@@ -31,14 +39,13 @@ def pmi(A, B):
 
 def diff(A, B):
     return (A-B)
-    
+
 def countSum(A, B):
     return sum([A, B])
 
 def valueConcat(A, B):
     return ([A, B])
 
-base_freq = convertFreq(base_count)
 frst_freq = convertFreq(frst_count)
 scnd_freq = convertFreq(scnd_count)
 
@@ -49,19 +56,15 @@ pmi_diff = merge(frst_pmi, scnd_pmi, f=diff)
 
 all_count = merge(frst_count, scnd_count, f=countSum)
 
-frst_pmi_count = merge(frst_pmi, frst_count, f=valueConcat)
-scnd_pmi_count = merge(scnd_pmi, scnd_count, f=valueConcat)
-pmi_diff_count = merge(pmi_diff, all_count, f=valueConcat)
+f = open(firstname + '_results.csv', 'w')
+for i in frst_pmi:
+    f.write(i + ',' + str(frst_pmi[i]) + ',' + str(frst_count[i]) + '\n')
 
+f = open(secondname + '_results.csv', 'w')
+for i in scnd_pmi:
+    f.write(i + ',' + str(scnd_pmi[i]) + ',' + str(scnd_count[i]) + '\n')
 
-f = open(firstname + '_results.csv', 'wb')
-for i in frst_pmi_count:
-    f.write(i + ',' + str(frst_pmi_count[i][0]) + str(frst_pmi_count[i][1]) + '\n')
-
-f = open(secondname + '_results.csv', 'wb')
-for i in scnd_pmi_count:
-    f.write(i + ',' + str(scnd_pmi_count[i][0]) + str(scnd_pmi_count[i][1]) + '\n')
-
-f = open(firstname + '_' + secondname + '_results.csv', 'wb')
-for i in pmi_diff_count:
-    f.write(i + ',' + str(pmi_diff_count[i][0]) + str(pmi_diff_count[i][1]) + '\n')
+f = open(firstname + '_' + secondname + '_results.csv', 'w')
+for i in pmi_diff:
+    f.write(i + ',' + str(pmi_diff[i]) + ',' + str(all_count[i]) + '\n')
+f.close()
