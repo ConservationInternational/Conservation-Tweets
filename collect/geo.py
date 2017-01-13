@@ -20,13 +20,24 @@ files = []
 for p in pages:
     for x in p['Contents']:
         files.append(x['Key'])
-        
+
+
+pages = paginator.paginate(Bucket='tweets-geo', Prefix='')
+skipfiles = []
+for p in pages:
+    for x in p['Contents']:
+        skipfiles.append(x['Key'])
+
+skipkeys = []
+for f in skipfiles[1:]:
+    skipkeys.append(f[:-4])
+
 keys = []
 for f in files[1:]:
     new = f[10:-15]
-    if new not in keys:
+    if (new not in keys) and (new not in skipkeys):
         keys.append(new)
-        
+    
 def getLat(string):
     if string == 'None':
         return('None')
@@ -65,7 +76,10 @@ for k in keys:
     df['gps_latitude'] = df['geo'].apply(getLat)
     df['gps_longitude'] = df['geo'].apply(getLon) 
     
-    dfgps = df.loc[df['gps_longitude']!='None',['id_str', 'created_at', 'gps_longitude', 'gps_latitude']]
+    if 'None' in df['gps_longitude']:
+        dfgps = df.loc[df['gps_longitude'].to_string()!='None',['id_str', 'created_at', 'gps_longitude', 'gps_latitude']]
+    else:
+        dfgps = df
 
     s3resource.Bucket('tweets-place').put_object(Key=(k + '.csv'),  Body=df.to_csv(None, encoding='utf-8', index=False))
     s3resource.Bucket('tweets-geo').put_object(Key=(k + '.csv'),  Body=dfgps.to_csv(None, encoding='utf-8', index=False))
