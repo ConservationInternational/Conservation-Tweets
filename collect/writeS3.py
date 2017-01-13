@@ -16,7 +16,7 @@ resolver = carmen.get_resolver()
 resolver.load_locations()
 
 for k in keywords:
-    data = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count,user.location.country,user.location.state,user.location.county,user.location.city,user.location.latitude,user.location.longitude']
+    data = ['text,id_str,coordinates,created_at,favorite_count,favorited,geo,place,retweet_count,retweeted,lang,user.favourites_count,user.friends_count,user.geo_enabled,user.location,user.name,user.statuses_count,country,state,county,city,latitude,longitude']
     ks = k.split('&')
     for fl in tagged_files:
         if k in fl and today in fl:                        
