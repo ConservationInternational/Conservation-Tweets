@@ -1,6 +1,8 @@
 #Remove non-english, non-indonesian tweets
 #Add columns for user.location vars
 
+#Run on 1-11-2017
+
 import boto3
 import pandas
 import carmen
@@ -12,12 +14,9 @@ s3resource = boto3.resource('s3')
 resolver = carmen.get_resolver()
 resolver.load_locations()
 
-paginator = s3client.get_paginator('list_objects')
-pages = paginator.paginate(Bucket='ci-tweets', Prefix='ByKeyword')
-files = []
-for p in pages:
-    for x in p['Contents']:
-        files.append(x['Key'])
+with open('oncemore.txt') as f:
+    files = f.readlines()
+files = [x.replace('"', '').strip() for x in files] 
 
 for f in files[1:]:
 	print(f)
