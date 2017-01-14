@@ -34,7 +34,7 @@ except:
         print(object)
 
 skipkeys = []
-for f in skipfiles[1:]:
+for f in skipfiles:
     skipkeys.append(f[:-4])
 
 keys = []
@@ -52,24 +52,29 @@ for i in f.readlines():
 for k in keys:
     wc = defaultdict(int)
     for f in files[1:]:
-        if k in f:
-            print(f)
-            out = s3client.get_object(Bucket='ci-tweets', Key=f)
-            df = pandas.read_csv(out['Body'], quoting=csv.QUOTE_NONE, error_bad_lines=False, warn_bad_lines=True)
-            
-            lines = df["text"].tolist()
-            for l in lines:
-                l = re.sub(r'[^a-z#@ ]', '', l.lower())
-                words = l.split()
-                for w in set(words):
-                    if w=='rt' or w in stopwords:
-                        pass
-                    elif w[:4]=='http':
-                        wc['http'] += 1
-                    else:
-                        wc[w] += 1
-                wc['TOTAL'] += 1
-    
+        if k==f[10:-15]:
+            try:
+                print(f)
+                out = s3client.get_object(Bucket='ci-tweets', Key=f)
+                df = pandas.read_csv(out['Body'], quoting=csv.QUOTE_NONE, error_bad_lines=False, warn_bad_lines=True)
+                
+                lines = df["text"].tolist()
+                for l in lines:
+                    l = re.sub(r'[^a-z#@ ]', '', l.lower())
+                    words = l.split()
+                    for w in set(words):
+                        if w=='rt' or w in stopwords:
+                            pass
+                        elif w[:4]=='http':
+                            wc['http'] += 1
+                        else:
+                            wc[w] += 1
+                    wc['TOTAL'] += 1
+            except:
+                f = open('wc-fail.txt')
+                f.write(f + '\n')
+                f.close()   
+                
     string = ''
     for i in wc:
         string += i
@@ -77,4 +82,6 @@ for k in keys:
         string += str(wc[i])
         string += '\n'
 
-    s3resource.Bucket('ci-tweets-wordcounts').put_object(Key=(k + '.csv'),  Body=string)
+    s3resource.Bucket('ci-tweet-wordcounts').put_object(Key=(k + '.csv'),  Body=string)
+
+
