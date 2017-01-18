@@ -65,7 +65,7 @@ for fl in temp_files:
             geotwt += ['', '']
                             
         geotwt = '@^@#%*^&%*$('.join(map(unicode, geotwt))
-        geotwt = twt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
+        geotwt = geotwt.replace(',', ' ').replace('\n', ' ').replace('\r', ' ').replace('@^@#%*^&%*$(', ',')
         
         if out.get('lang')=='en':
             enggeodata.append(geotwt)
