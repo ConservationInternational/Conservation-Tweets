@@ -8,3 +8,4 @@ analyze/llaves.R
 *.p
 analyze/*.csv
 analyze/**/*.csv
+*.png
