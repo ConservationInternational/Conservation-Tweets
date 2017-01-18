@@ -1,10 +1,10 @@
+from __future__ import division
 import pandas
 import math
 import boto3
 import pickle
 import csv
 import numpy as np
-from __future__ import division
 
 #Read in data, skipping words already in buck
 s3client = boto3.client('s3')
