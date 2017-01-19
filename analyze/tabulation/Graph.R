@@ -30,4 +30,5 @@ ggplot(tab, aes(`Co-Occuring Word`, Keyword)) + geom_tile(aes(fill=PMI), width=0
         plot.background = element_rect(fill="gray90"),
         axis.text = element_text(color="black", size=14), 
         axis.text.x = element_text(angle = 90, hjust = 1))
-       
+
+ggsave('output.png')
