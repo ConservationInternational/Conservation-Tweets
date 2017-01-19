@@ -4,7 +4,7 @@
 
 #than copy that file into your working directory
 
-setwd('D:/Documents and Settings/mcooper/Documents/Conservation Tweets/time-graph')
+setwd('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/temporal/from-keys')
 
 library(dplyr)
 library(ggplot2)
@@ -18,7 +18,7 @@ df$key <- substr(df$Path, 11, nchar(df$Path)-15)
 
 all_days_keys <- names(table(df$key)[table(df$key) == max(table(df$key))])
 
-sel_keys <- c(all_days_keys, 'cop.22', '#cop22', 'marrakesh', 'marrakech', 'earthtomarrakesh')
+sel_keys <- c(all_days_keys, 'whaling', 'cop.22', '#cop22', 'marrakesh', 'marrakech', 'earthtomarrakesh')
 
 df <- df[df$key %in% sel_keys, ]
 
@@ -56,7 +56,7 @@ plotit <- function(df, words){
   ggsave(paste0(words, '.png'))
 }
 
-for (i in c('cop.22', '#cop22', 'cop.22OR#cop22', 'marrakeshORmarrakech', '#earthtomarrakesh', '#globalwarming', '#globalwarmingORglobal.warming', 'climate.change', '#actonclimate', 'fossil.fuels')){
+for (i in c('whaling')){
   plotit(df, i)
 }
 
