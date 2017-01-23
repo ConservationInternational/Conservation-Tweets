@@ -5,8 +5,6 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 
-terms <- c('palm oil','deforestation', 'degradation')
-
 getData <- function(i){
   csv <- read.csv(paste0(i, '.csv'), col.names = c('time', 'count', 'baseline', 'frequency'))
   csv$time <- ymd_hms(csv$time) %>% date
@@ -27,4 +25,10 @@ plotTerms <- function(terms){
   
   ggsave(paste0(paste(terms, collapse='_'), '.png'))
 }
-  
+
+#plotTerms(c('palm oil','deforestation', 'degradation'))
+
+#plotTerms(c('global warming', 'climate change'))
+
+# plotTerms(c('asian carp', 'asian longhorned beetle', 'burmese python', 'cane toad', 'emerald ash borer', 'european starling', 'kudzu', 'lionfish', 'northern snakehead', 'norway rat', 'tegu', 'tree of heaven', 'water hyacinth', 'zebra mussels', 'nutria'))
+
