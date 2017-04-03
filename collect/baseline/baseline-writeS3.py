@@ -69,7 +69,7 @@ for fl in temp_files:
         
         if out.get('lang')=='en':
             enggeodata.append(geotwt)
-        elif out.get('lang')=='in':
+        elif out.get('lang')=='id':
             indgeodata.append(geotwt)            
 
     except:
@@ -78,8 +78,8 @@ for fl in temp_files:
 s3 = boto3.resource('s3')
 s3.Bucket('baseline-text').put_object(Key='en' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(engdata))
 s3.Bucket('baseline-text').put_object(Key='id' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(inddata))
-s3.Bucket('geo-baseline').put_object(Key=str(datetime.datetime.now()) + '.csv',  Body='\n'.join(enggeodata))
-s3.Bucket('geo-baseline').put_object(Key=str(datetime.datetime.now()) + '.csv',  Body='\n'.join(indgeodata))
+s3.Bucket('geo-baseline').put_object(Key='en' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(enggeodata))
+s3.Bucket('geo-baseline').put_object(Key='id' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(indgeodata))
 
 for fl in temp_files:
     try:
