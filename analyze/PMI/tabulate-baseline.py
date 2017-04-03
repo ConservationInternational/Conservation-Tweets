@@ -10,6 +10,9 @@ import pickle
 from collections import defaultdict
 import sys
 import re
+import datetime
+
+lang = 'id'
 
 if sys.platform == 'win32':
     f = open('D:/Documents and Settings/mcooper/.aws/credentials')
@@ -18,7 +21,7 @@ if sys.platform == 'win32':
     secret_key = read[2][24:-1]
     s3 = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_key)
     
-    stopwords = []    
+    stopwords = []
     f = open('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/stopwords.txt')
     for i in f.readlines():
         stopwords.append(i.rstrip('\n'))
@@ -27,13 +30,13 @@ elif sys.platform == 'linux2':
     s3 = boto3.client('s3')
     
     stopwords = []    
-    f = open('~/stopwords.txt')
+    f = open('stopwords.txt')
     for i in f.readlines():
         stopwords.append(i.rstrip('\n'))
 
 
 paginator = s3.get_paginator('list_objects')
-pages = paginator.paginate(Bucket='ci-tweets', Prefix='baseline/en')
+pages = paginator.paginate(Bucket='baseline-text', Prefix=lang)
 files = []
 for p in pages:
     for x in p['Contents']:
@@ -42,8 +45,8 @@ for p in pages:
 
 masterdict = defaultdict(int)
 for f in files:
-    print('now on file ' + f)
-    out = s3.get_object(Bucket='ci-tweets', Key=f)
+    print(str(float((files.index(f) + 1))/ float(len(files))*100)[:5] + '% now on file ' + f)
+    out = s3.get_object(Bucket='baseline-text', Key=f)
     file = out['Body'].read()
     lines = file.decode('utf-8').split('\n')
     for l in lines[1:]:
@@ -58,11 +61,11 @@ for f in files:
                 masterdict[w] += 1
         masterdict['TOTAL'] += 1
 
-pickle.dump(masterdict, open("baseline_2017-01-06_raw.p", "wb"), protocol=2)
+pickle.dump(masterdict, open("baseline_" + str(datetime.datetime.now())[:10] + "_" + lang + "raw.p", "wb"), protocol=2)
 
 masterdict = dict(masterdict)
 total = float(masterdict['TOTAL'])
 for i in masterdict:
     masterdict[i] = float(masterdict[i])/float(total)
  
-pickle.dump(masterdict, open("baseline_2017-01-06_prob.p", "wb"), protocol=2)
+pickle.dump(masterdict, open("baseline_" + str(datetime.datetime.now())[:10] + "_" + lang + "prob.p", "wb"), protocol=2)
