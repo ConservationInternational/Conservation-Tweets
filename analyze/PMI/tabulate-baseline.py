@@ -11,8 +11,9 @@ from collections import defaultdict
 import sys
 import re
 import datetime
+import random
 
-lang = 'id'
+lang = 'en'
 
 if sys.platform == 'win32':
     f = open('D:/Documents and Settings/mcooper/.aws/credentials')
@@ -44,6 +45,10 @@ for p in pages:
 
 
 masterdict = defaultdict(int)
+
+if len(files) > 400:
+	files = random.sample(files, 400)
+
 for f in files:
     print(str(float((files.index(f) + 1))/ float(len(files))*100)[:5] + '% now on file ' + f)
     out = s3.get_object(Bucket='baseline-text', Key=f)
@@ -67,5 +72,5 @@ masterdict = dict(masterdict)
 total = float(masterdict['TOTAL'])
 for i in masterdict:
     masterdict[i] = float(masterdict[i])/float(total)
- 
+
 pickle.dump(masterdict, open("baseline_" + str(datetime.datetime.now())[:10] + "_" + lang + "prob.p", "wb"), protocol=2)
