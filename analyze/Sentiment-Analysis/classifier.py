@@ -1,23 +1,35 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr  4 15:25:55 2017
-
-@author: mcooper
-"""
-
-import os
-import pickle
 import pandas as pd
+import os
+from collections import defaultdict
+import re
 
 os.chdir('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/Sentiment-Analysis')
 
+df = pd.read_csv('Climate_trainingdata.csv')
 
-believes = pickle.load(open('believes_wc.p', 'rb'))
-ambiguous = pickle.load(open('ambiguous_wc.p', 'rb'))
-disbelieves = pickle.load(open('disbelieves_wc.p', 'rb'))
+classes = df['class'].unique()
 
-df = pd.DataFrame([believes, ambiguous, disbelieves]).T
-df.columns = ['believes', 'ambiguous', 'disbelieves']
+dicts = []
+for c in classes:
+    lines = df.loc[df['class'] == c, 'text']
+    masterdict = defaultdict(int)
+    for l in lines:
+        l = re.sub(r'[^a-z#@ ]', '', l.lower())
+        words = l.split()
+        for w in set(words):
+            if w=='rt':
+                pass
+            elif w[:4]=='http':
+                masterdict['http'] += 1
+            else:
+                masterdict[w] += 1
+        masterdict['TOTAL'] += 1
+    dicts.append(masterdict)
+    
+df = pd.DataFrame(dicts).T
+df.columns = classes
+
+file = 'ambiguous.csv'
 
 
 df = df.fillna(1)
@@ -29,7 +41,7 @@ df = df.drop('TOTAL')
 
 
 
-tweet = 'al gore'
+tweet = 'test'
 
 wds = tweet.lower().split(' ')
 
