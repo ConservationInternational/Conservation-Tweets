@@ -1,6 +1,6 @@
 
 #Run the following command
-#aws s3 ls s3://ci-tweets/ByKeyword --recurstive > Keywords.txt
+#aws s3 ls s3://ci-tweets/ByKeyword --recursive > Keywords.txt
 
 #than copy that file into your working directory
 
@@ -16,9 +16,13 @@ names(df) <- c('Date.Written', 'Time.Written', 'Size', 'Path')
 df$date <- substr(df$Path, nchar(df$Path)-13, nchar(df$Path)-4)
 df$key <- substr(df$Path, 11, nchar(df$Path)-15)
 
-all_days_keys <- names(table(df$key)[table(df$key) == max(table(df$key))])
+df$date <- ymd(df$date)
 
-sel_keys <- c(all_days_keys, 'whaling', 'cop.22', '#cop22', 'marrakesh', 'marrakech', 'earthtomarrakesh')
+df <- df[df$date > ymd('2016-11-10'), ]
+
+all_days_keys <- names(table(df$key)[table(df$key) > 100])
+
+sel_keys <- c(all_days_keys)
 
 df <- df[df$key %in% sel_keys, ]
 
@@ -56,7 +60,7 @@ plotit <- function(df, words){
   ggsave(paste0(words, '.png'))
 }
 
-for (i in c('whaling')){
+for (i in all_days_keys){
   plotit(df, i)
 }
 
