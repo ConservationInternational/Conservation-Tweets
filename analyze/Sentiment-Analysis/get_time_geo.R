@@ -22,11 +22,8 @@ for (b in bucket){
 }
 
 getCoord <- function(str, coord){
-  if (str == 'None'){
-    return(NA)
-  }
-  json <- fromJSON(gsub('  ', ', ', gsub("'", '"', gsub("u'", "'", str))))
-  coords <- json$coordinates
+  coords <- NA
+  try(coords <- fromJSON(gsub('  ', ', ', gsub("'", '"', gsub("u'", "'", str))))$coordinates, silent=T)
   if (coord == 'lat'){
     return(coords[2])
   }
