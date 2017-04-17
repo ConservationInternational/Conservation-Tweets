@@ -2,6 +2,7 @@ from __future__ import division
 import pandas as pd
 import boto3
 import csv
+import numpy as np
 
 s3client = boto3.client('s3')
 s3resource = boto3.resource('s3')
@@ -32,7 +33,7 @@ for d in dates[1:]:
     for f in sel_files:
         if d in f:
             date_files.append(f)
-            
+    
     df = pd.DataFrame()
     for f in date_files:
         out = s3client.get_object(Bucket='ci-tweets', Key=f)
@@ -41,6 +42,8 @@ for d in dates[1:]:
         temp['keyword'] = f[10:-15]
         
         df = df.append(temp, ignore_index = True)
+        
+    df = df[pd.notnull(df['text'])]
     
     print('Classifying')
     

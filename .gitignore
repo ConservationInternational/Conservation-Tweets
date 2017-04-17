@@ -9,3 +9,5 @@ analyze/llaves.R
 analyze/*.csv
 analyze/**/*.csv
 *.png
+*.zip
+S3_keys.R
