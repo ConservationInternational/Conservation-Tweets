@@ -11,3 +11,14 @@ analyze/**/*.csv
 *.png
 *.zip
 S3_keys.R
+*.avl
+*.dbf
+*.prj
+*.sbn
+*.sbx
+*.shp
+*.shx
+*.cpg
+*.lock
+*.html
+*.txt
