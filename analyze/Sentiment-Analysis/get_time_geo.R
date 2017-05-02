@@ -18,7 +18,9 @@ bucket <- get_bucket("ci-tweets-sentiment")
 
 keys <- NULL
 for (b in bucket){
-  keys <- c(keys, b$Key)
+  if (grepl('climate', b$Key)){
+    keys <- c(keys, b$Key)
+  }
 }
 
 getCoord <- function(str, coord){
@@ -32,7 +34,7 @@ getCoord <- function(str, coord){
   }
 }
 
-ts_df <- data.frame()
+#ts_df <- data.frame()
 geo_df <- data.frame()
 for (k in keys[2:length(keys)]){
   print(k)
@@ -42,25 +44,21 @@ for (k in keys[2:length(keys)]){
   
   temp$day <- floor_date(parse_date_time(temp$created_at, '%a %b %d! %H!:%M!:%S! %z!* %Y!'), 'day')
   
-  ts_df <- bind_rows(ts_df, temp[ , c('day', 'max', 'keyword')])
+  #ts_df <- bind_rows(ts_df, temp[ , c('day', 'max', 'keyword')])
   
-  geo_df <- bind_rows(geo_df, temp[!is.na(temp$latitude) | !is.na(temp$lat_exact), c('latitude', 'longitude', 'lat_exact', 'long_exact', 'max', 'keyword')])
+  geo_df <- bind_rows(geo_df, temp[!is.na(temp$latitude) | !is.na(temp$lat_exact), c('latitude', 'longitude', 'lat_exact', 'long_exact', 'max', 'keyword', 'text')])
 }
 
 geo_df_exact <- geo_df %>% filter(!is.na(geo_df$lat_exact)) %>% 
-  group_by(lat_exact, long_exact, keyword, max) %>%
-  summarize(count=n()) %>% 
-  select(latitude=lat_exact, longitude=long_exact, class=max, keyword)
+  select(latitude=lat_exact, longitude=long_exact, class=max, keyword, text)
 
 geo_df_est <- geo_df %>% filter(!is.na(latitude)) %>%
-  group_by(latitude, longitude, keyword, max) %>%
-  summarize(count=n()) %>%
-  select(latitude, longitude, keyword, count, class=max)
+  select(latitude, longitude, keyword, class=max, text)
 
-ts_df_sum <- ts_df %>%
-  group_by(day, max, keyword) %>%
-  summarize(count=n())
+# ts_df_sum <- ts_df %>%
+#   group_by(day, max, keyword) %>%
+#   summarize(count=n())
 
-write.csv(ts_df_sum, 'timeseries_sentiment_climate.csv', row.names=F)
+#write.csv(ts_df_sum, 'timeseries_sentiment_climate.csv', row.names=F)
 write.csv(geo_df_exact, 'spatial_sentiment_climate_exact.csv', row.names=F)
 write.csv(geo_df_est, 'spatial_sentiment_climate_estimate.csv', row.names=F)
