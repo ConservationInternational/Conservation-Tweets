@@ -1,7 +1,7 @@
 import boto3
-import pandas
+import pandas as pd
 import csv
-import numpy as np
+from collections import defaultdict
 
 keywords = ["climate.change", "climatechange", "globalwarming", "global.warming"]
  
@@ -23,10 +23,13 @@ health = ['sick', 'death', 'disease', 'health', 'illness', 'pandemic', 'malaria'
 finance = ['stock', 'market', 'finance', 'investment', 'fund', 'money']
 
 #also get most used media
-
-
-#also get retweets for all of the keywords above
-
+def mediaGrab(df, wc):
+    bigstr = df['text'].to_string(index=False).split()
+    #returns a tabulation of all tokens starting with 'http' within the 'text' column of a dataframe
+    for i in bigstr:
+        if i[:4] == 'http' and '...' not in i:
+            wc[i] += 1
+    return(wc)
 
 #Read in data, skipping words already in buck
 s3client = boto3.client('s3')
@@ -41,25 +44,39 @@ for k in keywords:
         for x in p['Contents']:
             files.append(x['Key'])
 
+keys = nature + energy + conflict + health + finance + ['ENERGY', 'NATURE', 'CONFLICT', 'HEALTH', 'FINANCE']
+values = ['sum']*len(keys)
+agdict = dict(zip(keys, values))
+agdict['RT'] = 'count'
 
-s3client = boto3.client('s3')
-
-pmi = pandas.DataFrame(index=keywords, columns=countwords).apply(pandas.to_numeric)
-count = pandas.DataFrame(index=keywords, columns=countwords).apply(pandas.to_numeric)
-
+wc = defaultdict(int)
+accumdf = pd.DataFrame()
 for f in files:
-    out = s3client.get_object(Bucket='ci-tweets', Key=k + '.csv')
-    df = pandas.read_csv(out['Body'], quoting=csv.QUOTE_NONE, error_bad_lines=False, warn_bad_lines=True)
+    print(f)
+    out = s3client.get_object(Bucket='ci-tweets', Key=f)
+    df = pd.read_csv(out['Body'], quoting=csv.QUOTE_NONE, error_bad_lines=False, warn_bad_lines=True)
     
-    temp = pandas.DataFrame()
-    for c in countwords:
-        if sum(df['word'] == c):
-            pmi = pmi.set_value(k, c, float(df.loc[df['word']==c, 'PMI']))
-            count = count.set_value(k, c, float(df.loc[df['word']==c, 'count']))
-        else:
-            pmi = pmi.set_value(k, c, np.nan)
-            count = count.set_value(k, c, np.nan)
-
-
-pmi.to_csv('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/tabulation/Word_Tablulation.csv')
-count.to_csv('D:/Documents and Settings/mcooper/GitHub/Conservation-Tweets/analyze/tabulation/Count.csv')
+    for w in nature + energy + conflict + health + finance:
+        df[w] = df['text'].str.lower().str.contains(w)
+    
+    df['RT'] = df['text'].str.contains('^RT', regex=True)    
+    
+    df['ENERGY'] = df[energy].apply(func=any, axis=1)
+    df['NATURE'] = df[nature].apply(func=any, axis=1)
+    df['CONFLICT'] = df[conflict].apply(func=any, axis=1)
+    df['HEALTH'] = df[health].apply(func=any, axis=1)
+    df['FINANCE'] = df[finance].apply(func=any, axis=1)
+    
+    df['keyword'] = f[10:-15]
+    df['date'] = f[-14:-4]
+    
+    dfnew = df.groupby(['keyword', 'date', 'RT']).agg(agdict)
+    
+    accumdf = pd.concat([accumdf, dfnew])
+    
+    wc = mediaGrab(df, wc)
+    
+accumdf.to_csv('keywords.csv')
+with open('media.csv', 'w') as f:
+    for w in wc:
+        f.write(w + ',' + str(wc[w]) + '\n')
