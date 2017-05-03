@@ -31,6 +31,15 @@ def mediaGrab(df, wc):
             wc[i] += 1
     return(wc)
 
+#also get most mentioned users
+def userGrab(df, wc):
+    bigstr = df['text'].to_string(index=False).split()
+    #returns a tabulation of all tokens starting with 'http' within the 'text' column of a dataframe
+    for i in bigstr:
+        if i[:1] == '@' and '...' not in i:
+            wc[i] += 1
+    return(wc)
+
 #Read in data, skipping words already in buck
 s3client = boto3.client('s3')
 s3resource = boto3.resource('s3')
@@ -49,12 +58,17 @@ values = ['sum']*len(keys)
 agdict = dict(zip(keys, values))
 agdict['RT'] = 'count'
 
-wc = defaultdict(int)
+
+already = []
+users = defaultdict(int)
+media = defaultdict(int)
 accumdf = pd.DataFrame()
 for f in files:
     print(f)
     out = s3client.get_object(Bucket='ci-tweets', Key=f)
     df = pd.read_csv(out['Body'], quoting=csv.QUOTE_NONE, error_bad_lines=False, warn_bad_lines=True)
+    
+    df = df[df['id_str'].isin(already)]
     
     for w in nature + energy + conflict + health + finance:
         df[w] = df['text'].str.lower().str.contains(w)
@@ -74,9 +88,17 @@ for f in files:
     
     accumdf = pd.concat([accumdf, dfnew])
     
-    wc = mediaGrab(df, wc)
+    media = mediaGrab(df, media)
+    
+    users = userGrab(df, users)
+    
+    already = already + df['id_str'].tolist()
     
 accumdf.to_csv('keywords.csv')
-with open('media.csv', 'w') as f:
-    for w in wc:
-        f.write(w + ',' + str(wc[w]) + '\n')
+with open('media.csv', 'w', encoding='utf8') as f:
+    for w in media:
+        f.write(w + ',' + str(media[w]) + '\n')
+        
+with open('users.csv', 'w', encoding='utf8') as f:
+    for w in users:
+        f.write(w + ',' + str(users[w]) + '\n')
