@@ -2,6 +2,7 @@ import boto3
 import pandas as pd
 import csv
 from collections import defaultdict
+import io
 
 keywords = ["climate.change", "climatechange", "globalwarming", "global.warming"]
  
@@ -68,7 +69,7 @@ for f in files:
     out = s3client.get_object(Bucket='ci-tweets', Key=f)
     df = pd.read_csv(out['Body'], quoting=csv.QUOTE_NONE, error_bad_lines=False, warn_bad_lines=True)
     
-    df = df[df['id_str'].isin(already)]
+    df = df[~df['id_str'].isin(already)]
     
     for w in nature + energy + conflict + health + finance:
         df[w] = df['text'].str.lower().str.contains(w)
@@ -95,10 +96,10 @@ for f in files:
     already = already + df['id_str'].tolist()
     
 accumdf.to_csv('keywords.csv')
-with open('media.csv', 'w', encoding='utf8') as f:
+with io.open('media.csv', 'w', encoding='utf8') as f:
     for w in media:
         f.write(w + ',' + str(media[w]) + '\n')
-        
-with open('users.csv', 'w', encoding='utf8') as f:
+
+with io.open('users.csv', 'w', encoding='utf8') as f:
     for w in users:
         f.write(w + ',' + str(users[w]) + '\n')
