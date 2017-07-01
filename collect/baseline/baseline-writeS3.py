@@ -9,9 +9,11 @@ import ast
 temp_files = os.listdir('temp_tweets')
 
 engdata = ['text']
-inddata = ['text']   
+inddata = ['text']
+msdata = ['text']   
 enggeodata = ['id_str,user.location,country,state,county,city,latitude,longitude,gps_latitude,gps_longitude']
 indgeodata = ['id_str,user.location,country,state,county,city,latitude,longitude,gps_latitude,gps_longitude']
+msgeodata = ['id_str,user.location,country,state,county,city,latitude,longitude,gps_latitude,gps_longitude']
 
 def getLat(string):
     if string == 'None':
@@ -23,7 +25,7 @@ def getLat(string):
             return(d['coordinates'][0])
         except:
             return('None')
-
+    
 def getLon(string):
     if string == 'None':
         return('None')
@@ -40,14 +42,16 @@ resolver.load_locations()
    
 for fl in temp_files:
     try:
-		f = open('temp_tweets/' + fl, 'r')
-		out = json.loads(f.read())
-		f.close()
-		twt = out.get('text')
-		if out.get('lang') == 'en':
-			engdata.append(re.sub(r'[^a-z#@ ]', '', twt.lower().replace('\n', '').replace('\n', '')))
-		if out.get('lang') == 'in':
-			inddata.append(re.sub(r'[^a-z#@ ]', '', twt.lower().replace('\n', '').replace('\n', '')))
+        f = open('temp_tweets/' + fl, 'r')
+        out = json.loads(f.read())
+        f.close()
+        twt = out.get('text')
+        if out.get('lang') == 'en':
+            engdata.append(re.sub(r'[^a-z#@ ]', '', twt.lower().replace('\n', '').replace('\r', '')))
+        if out.get('lang') == 'in':
+            inddata.append(re.sub(r'[^a-z#@ ]', '', twt.lower().replace('\n', '').replace('\r', '')))
+        if out.get('lang') == 'ms':
+            msdata.append(re.sub(r'[^a-z#@ ]', '', twt.lower().replace('\n', '').replace('\r', '')))
             
         geotwt = [out.get('id_str'),
                 out.get('user').get('location')]
@@ -70,7 +74,9 @@ for fl in temp_files:
         if out.get('lang')=='en':
             enggeodata.append(geotwt)
         elif out.get('lang')=='in':
-            indgeodata.append(geotwt)            
+            indgeodata.append(geotwt)
+        elif out.get('lang')=='ms':
+            msgeodata.append(geotwt)
 
     except:
         pass
@@ -78,8 +84,10 @@ for fl in temp_files:
 s3 = boto3.resource('s3')
 s3.Bucket('baseline-text').put_object(Key='en' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(engdata))
 s3.Bucket('baseline-text').put_object(Key='in' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(inddata))
+s3.Bucket('baseline-text').put_object(Key='ms' + str(datetime.datetime.now()) + '.csv', Body-'\n'.join(msdata))
 s3.Bucket('geo-baseline').put_object(Key='en' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(enggeodata))
 s3.Bucket('geo-baseline').put_object(Key='in' + str(datetime.datetime.now()) + '.csv',  Body='\n'.join(indgeodata))
+s3.Bucket('geo-baseline').put_object(Key='ms' + str(datetime.datetime.now()) + '.csv', Body='\n'.join(msgeodata))
 
 for fl in temp_files:
     try:
