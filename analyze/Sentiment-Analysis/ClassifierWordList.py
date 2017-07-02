@@ -23,9 +23,11 @@ class ClassifyWordList:
             print('Warning: Some words appear in both lists')
     
     def tokenize(self, tweet):
+        if not isinstance(tweet, str):
+            tweet = ''
         #Lots of quotes to convery sarcasm. Use quotes?
         if self.tokens == 1:
-            tokens = re.sub(r'[^a-z#@ ]', '', tweet.lower()).split(' ')
+            tokens = re.sub(r'[^a-z#@ ]c', '', tweet.lower()).split(' ')
             while '' in tokens:
                 tokens.remove('')
         elif self.tokens == 2:

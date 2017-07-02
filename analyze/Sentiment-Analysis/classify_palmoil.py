@@ -1,8 +1,8 @@
-import os
 import pandas as pd
 import boto3
 import csv
 from collections import defaultdict
+import random
 
 execfile('ClassifierWordList.py')
 
@@ -16,11 +16,14 @@ def classifyTheme(readbucket, readprefix, classifier, writebucket, writeprefix):
     for p in pages:
         for x in p['Contents']:
             files.append(x['Key'])
+    
+    if len(files) > 200 and readbucket == 'baseline-text':
+        files = random.sample(files, 200)
 
     dd = defaultdict(int)
     for i in files:
         print(i)
-        out = s3client.get_object(Bucket='ci-tweets', Key=i)
+        out = s3client.get_object(Bucket=readbucket, Key=i)
         temp = pd.read_csv(out['Body'], quoting=csv.QUOTE_NONE, error_bad_lines=False, warn_bad_lines=True)
         
         temp['class'] = temp.text.apply(classifier.classify)
@@ -29,9 +32,12 @@ def classifyTheme(readbucket, readprefix, classifier, writebucket, writeprefix):
         
         s3resource.Bucket(writebucket).put_object(Key=i.replace(readprefix, writeprefix), Body=temp.to_csv(None, encoding='utf-8', index=False))        
     
-        dd['tie'] += vc['tie']
-        dd['positive'] += vc['positive']
-        dd['negative'] += vc['negative']
+        if 'tie' in vc.index:
+            dd['tie'] += vc['tie']
+        if 'positive' in vc.index:
+            dd['positive'] += vc['positive']
+        if 'negative' in vc.index:
+            dd['negative'] += vc['negative']
     
     return(dd)
 
@@ -46,37 +52,41 @@ def writeDict(dictionary, name):
     f.write(string)
     f.close()
 
+
+#Get Wordlists
 f = open('negative-words.txt')
 engneg = f.read().split('\n')
 f = open('positive-words.txt')
 engpos = f.read().split('\n')
 
+f = open("negative.txt")
+indneg = f.read().split('\r\n')
+f = open("positive.txt")
+indpos = f.read().split('\r\n')
 
-#Make english classifier
-english = ClassifyWordList(engpos, engneg, 'positive', 'negative')
-
-#Classify PalmOil
-eng_dd = classifyTheme('ci-tweets', 'ByKeyword/palm.oil', english, 'ci-tweets-sentiment', 'palmoil/palm.oil')
-writeDict(eng_dd, 'eng_dd.csv')
+#Make classifiers
+#english = ClassifyWordList(engpos, engneg, 'positive', 'negative')
+bahasa = ClassifyWordList(indpos, indneg, 'positive', 'negative')
 
 #Classify English Baseline
-eng_base_dd = classifyTheme('baseline-text', 'en', english, 'ci-tweets-sentiment', 'engbase/en')
-writeDict(eng_base_dd, 'eng_base_dd.csv')
+#eng_base_dd = classifyTheme('baseline-text', 'en', english, 'ci-tweets-sentiment', 'engbase/en')
+#writeDict(eng_base_dd, 'eng_base_dd.csv')
 
-f = open("negative.txt")
-indneg = f.read().split('\n')
-f = open("positive.txt")
-indpos = f.read().split('\n')
-
-#Make Bahasa classfier
-bahasa = ClassifyWordList(indpos, indneg, 'positive', 'negative')
+#Classify Bahasa Baseline
+ind_base_dd = classifyTheme('baseline-text', 'in', bahasa, 'ci-tweets-sentiment', 'indbase/in')
+writeDict(ind_base_dd, 'ind_base_dd.csv')
 
 #Classify Sawit
 ind_dd = classifyTheme('ci-tweets', 'ByKeyword/sawit', bahasa, 'ci-tweets-sentiment', 'sawit/sawit')
 writeDict(ind_dd, 'ind_dd.csv')
 
-#Classify Bahasa Baseline
-ind_base_dd = classifyTheme('baseline-text', 'in', bahasa, 'ci-tweets-sentiment', 'indbase/in')
-writeDict(ind_base_dd, 'ind_base_dd.csv')
+#Classify PalmOil
+#eng_dd = classifyTheme('ci-tweets', 'ByKeyword/palm.oil', english, 'ci-tweets-sentiment', 'palmoil/palm.oil')
+#writeDict(eng_dd, 'eng_dd.csv')
+
+
+
+
+
 
 
