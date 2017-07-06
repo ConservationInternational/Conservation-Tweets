@@ -4,9 +4,9 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 
-ind <- read.csv('ind_dd.csv', header=F, col.names = c('class', 'count')) %>%
+ind <- read.csv('ind_dd_bigram.csv', header=F, col.names = c('class', 'count')) %>%
   mutate(freq=count/sum(count), lang='indonesian', tweets='palm')
-ind_base <- read.csv('ind_base_dd.csv', header=F, col.names = c('class', 'count')) %>%
+ind_base <- read.csv('ind_base_dd_bigram.csv', header=F, col.names = c('class', 'count')) %>%
   mutate(freq=count/sum(count), lang='indonesian', tweets='base')
 eng <- read.csv('eng_dd.csv', header=F, col.names = c('class', 'count')) %>%
   mutate(freq=count/sum(count), lang='english', tweets='palm')
@@ -15,7 +15,7 @@ eng_base <- read.csv('eng_base_dd.csv', header=F, col.names = c('class', 'count'
 
 all <- Reduce(f = rbind, x=list(ind, ind_base, eng, eng_base))
 
-ggplot(all) + geom_bar(aes(x=class, y=freq), stat='identity') + 
+ggplot(all) + geom_bar(aes(x=class, y=freq, fill=lang, color=tweets), stat='identity', position='dodge') + 
   facet_wrap(lang~tweets)
 
 dif <- all %>% 

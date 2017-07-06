@@ -61,25 +61,8 @@ f = open("positive.txt")
 indpos = f.read().split('\r\n')
 
 #Make classifiers
-#english = ClassifyWordList(engpos, engneg, 'positive', 'negative', tokens=12)
+english = ClassifyWordList(engpos, engneg, 'positive', 'negative', tokens=1)
 bahasa = ClassifyWordList(indpos, indneg, 'positive', 'negative', tokens=12)
-
-#Classify English Baseline
-#eng_base_dd = classifyTheme('baseline-text', 'en', english, 'ci-tweets-sentiment', 'engbase/en')
-#writeDict(eng_base_dd, 'eng_base_dd.csv')
-
-#Classify Bahasa Baseline
-#ind_base_dd = classifyTheme('baseline-text', 'in', bahasa.classify, 'ci-tweets-sentiment', 'indbase/in')
-#writeDict(ind_base_dd, 'ind_base_dd_bigram.csv')
-
-#Classify Sawit
-ind_dd = classifyTheme('ci-tweets', 'ByKeyword/sawit', bahasa.classify, 'ci-tweets-sentiment', 'sawit/sawit')
-writeDict(ind_dd, 'ind_dd_bigram.csv')
-
-#Classify PalmOil
-#eng_dd = classifyTheme('ci-tweets', 'ByKeyword/palm.oil', english, 'ci-tweets-sentiment', 'palmoil/palm.oil')
-#writeDict(eng_dd, 'eng_dd.csv')
-
 
 #Classify English Baseline
 eng_base_dd = classifyTheme('baseline-text', 'en', english.classifyrange, 'ci-tweets-sentiment', 'engbase/en')
