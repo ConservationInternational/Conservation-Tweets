@@ -22,14 +22,14 @@ class ClassifyWordList:
             print('Warning: Some words appear in both lists')
     
     def tokenize1(self, tweet):
-        tokens = re.sub(r'[^a-z#@ ]c', '', tweet.lower()).split(' ')
+        tokens = re.sub(r'[^a-z#@ ]', '', tweet.lower()).split(' ')
         while '' in tokens:
             tokens.remove('')
         return(tokens)
     
     def tokenize2(self, tweet):
         tokens = []
-        words = re.sub(r'[^0-9a-z#@ ]', '', tweet.lower()).split(' ')
+        words = re.sub(r'[^a-z#@ ]', '', tweet.lower()).split(' ')
         words = ['' if x=='rt' else x for x in words]
         while '' in words:
             words.remove('')
