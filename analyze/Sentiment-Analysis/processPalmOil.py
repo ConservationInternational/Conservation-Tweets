@@ -36,7 +36,7 @@ bahasa = ClassifyWordList(indpos, indneg, 'positive', 'negative', tokens=12)
 
 
 def writeDD(dd, filename):
-    with io.open(filename, 'w', encoding='utf8') as f:
+    with open(filename, 'w') as f:
         for w in dd:
             f.write(w + ',' + str(dd[w]) + '\n')
 
@@ -91,7 +91,7 @@ for f in files:
     total = 0
     
     for t,c in zip(df['text'], df['class']):
-        words = english.tokenize1(t)
+        words = english.tokenize1(str(t))
         
         total += 1
         
