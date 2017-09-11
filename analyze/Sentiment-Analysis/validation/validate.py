@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Apr  6 10:31:49 2017
-
 @author: mcooper
 """
 
